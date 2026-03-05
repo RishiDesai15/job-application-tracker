@@ -3,7 +3,7 @@
    app.js
 =========================== */
 
-// ── SAMPLE DATA (pre-loaded if localStorage is empty) ──────────────────────
+// ── DATA ──────────────────────
 const SAMPLE_DATA = [
   { id: uid(), company: "Mave AI",      position: "Junior Data Engineer",          response: "Interview",  notes: "Apply again in March",                appliedDate: "2025-11-20", result: "",               emails: "Emma Merry: emma@maveai.co" },
   { id: uid(), company: "BestBuy",      position: "Data Analyst",                  response: "Rejected",   notes: "",                                    appliedDate: "2025-11-22", result: "",               emails: "" },

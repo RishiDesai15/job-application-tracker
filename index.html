@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Job Hunt — Application Tracker</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-left">
+      <div class="logo-mark">JH</div>
+      <div>
+        <h1>Job Hunt</h1>
+        <p class="subtitle">Application Tracker</p>
+      </div>
+    </div>
+    <div class="header-stats" id="header-stats"></div>
+    <button class="btn-add" id="openModal">+ Add Application</button>
+  </header>
+
+  <!-- FILTERS BAR -->
+  <div class="filters-bar">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="searchInput" placeholder="Search company, role, notes…" />
+    </div>
+    <div class="filter-pills" id="filterPills">
+      <button class="pill active" data-filter="all">All</button>
+      <button class="pill" data-filter="Interview">Interview</button>
+      <button class="pill" data-filter="Rejected">Rejected</button>
+      <button class="pill" data-filter="Waiting">Waiting</button>
+      <button class="pill" data-filter="Intro Call">Intro Call</button>
+      <button class="pill" data-filter="Offer">Offer 🎉</button>
+      <button class="pill" data-filter="">Pending</button>
+    </div>
+    <button class="btn-export" id="exportCSV" title="Export to CSV">↓ CSV</button>
+  </div>
+
+  <!-- TABLE -->
+  <main>
+    <div class="table-wrap">
+      <table id="appTable">
+        <thead>
+          <tr>
+            <th data-col="company" class="sortable">Company <span class="sort-icon">↕</span></th>
+            <th data-col="position" class="sortable">Position <span class="sort-icon">↕</span></th>
+            <th data-col="response">Status</th>
+            <th data-col="notes">Notes</th>
+            <th data-col="appliedDate" class="sortable">Applied <span class="sort-icon">↕</span></th>
+            <th data-col="result">Result</th>
+            <th data-col="emails">Contacts</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div id="emptyState" class="empty-state" style="display:none">
+        <div class="empty-icon">📭</div>
+        <p>No applications found.</p>
+        <span>Add your first one above, or change the filter.</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle">New Application</h2>
+        <button class="modal-close" id="closeModal">✕</button>
+      </div>
+      <form id="appForm" autocomplete="off">
+        <input type="hidden" id="editId" />
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Company *</label>
+            <input type="text" id="fCompany" placeholder="e.g. Google" required />
+          </div>
+          <div class="form-group">
+            <label>Position *</label>
+            <input type="text" id="fPosition" placeholder="e.g. Data Engineer" required />
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="fResponse">
+              <option value="">Pending</option>
+              <option value="Interview">Interview</option>
+              <option value="Intro Call">Intro Call</option>
+              <option value="Waiting">Waiting</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Offer">Offer 🎉</option>
+              <option value="Withdrawn">Withdrawn</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Applied Date</label>
+            <input type="date" id="fDate" />
+          </div>
+          <div class="form-group full-width">
+            <label>Notes</label>
+            <textarea id="fNotes" placeholder="e.g. Written Technical done, waiting on next round…" rows="2"></textarea>
+          </div>
+          <div class="form-group full-width">
+            <label>Result / Outcome</label>
+            <input type="text" id="fResult" placeholder="e.g. Passed technical, ghosted after round 2…" />
+          </div>
+          <div class="form-group full-width">
+            <label>Contact Emails</label>
+            <textarea id="fEmails" placeholder="Name: email@company.com&#10;Name: email@company.com" rows="2"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" id="cancelModal">Cancel</button>
+          <button type="submit" class="btn-save">Save Application</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- DELETE CONFIRM -->
+  <div class="modal-overlay" id="deleteOverlay">
+    <div class="modal confirm-modal">
+      <div class="modal-header">
+        <h2>Delete Application?</h2>
+        <button class="modal-close" id="cancelDelete">✕</button>
+      </div>
+      <p style="color:var(--muted); margin: 1rem 0 1.5rem;">This action cannot be undone.</p>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="cancelDelete2">Cancel</button>
+        <button class="btn-delete-confirm" id="confirmDelete">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

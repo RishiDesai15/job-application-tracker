@@ -427,6 +427,7 @@ function rowHTML(app) {
   const rowClass  = rowStatusClass(status);
   const badge     = badgeHTML(status);
   const dateStr   = app.appliedDate ? formatDate(app.appliedDate) : '—';
+  const interviewStr = app.interviewTime ? formatDateTime(app.interviewTime) : '—';
   const emailsStr = formatEmails(app.emails || '');
 
   return `
@@ -437,6 +438,7 @@ function rowHTML(app) {
       <td class="td-notes" title="${esc(app.notes || '')}">${esc(app.notes || '—')}</td>
       <td class="td-date">${dateStr}</td>
       <td class="td-result" title="${esc(app.result || '')}">${esc(app.result || '—')}</td>
+      <td class="td-interview" title="${esc(app.interviewTime || '')}">${interviewStr}</td>
       <td class="td-emails">${emailsStr}</td>
       <td>
         <div class="actions">
@@ -478,6 +480,20 @@ function formatDate(d) {
     const [y,m,day] = d.split('-');
     return `${parseInt(m)}/${parseInt(day)}/${y}`;
   } catch { return d; }
+}
+
+function formatDateTime(dt) {
+  if (!dt) return '—';
+  try {
+    const date = new Date(dt);
+    if (isNaN(date)) return dt;
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const mins = String(date.getMinutes()).padStart(2, '0');
+    return `${month}/${day}/${year} ${hours}:${mins}`;
+  } catch { return dt; }
 }
 
 function formatEmails(raw) {
@@ -615,6 +631,7 @@ function openEdit(id) {
   document.getElementById('fNotes').value     = app.notes || '';
   document.getElementById('fResult').value    = app.result || '';
   document.getElementById('fEmails').value    = app.emails || '';
+  document.getElementById('fInterviewTime').value = app.interviewTime || '';
   document.getElementById('modalOverlay').classList.add('open');
 }
 
@@ -638,14 +655,15 @@ function handleSubmit(e) {
   const id = document.getElementById('editId').value;
 
   const entry = {
-    id:          id || uid(),
-    company:     document.getElementById('fCompany').value.trim(),
-    position:    document.getElementById('fPosition').value.trim(),
-    response:    document.getElementById('fResponse').value,
-    appliedDate: document.getElementById('fDate').value,
-    notes:       document.getElementById('fNotes').value.trim(),
-    result:      document.getElementById('fResult').value.trim(),
-    emails:      document.getElementById('fEmails').value.trim(),
+    id:            id || uid(),
+    company:       document.getElementById('fCompany').value.trim(),
+    position:      document.getElementById('fPosition').value.trim(),
+    response:      document.getElementById('fResponse').value,
+    appliedDate:   document.getElementById('fDate').value,
+    notes:         document.getElementById('fNotes').value.trim(),
+    result:        document.getElementById('fResult').value.trim(),
+    emails:        document.getElementById('fEmails').value.trim(),
+    interviewTime: document.getElementById('fInterviewTime').value,
   };
 
   if (id) {
@@ -664,10 +682,10 @@ function handleSubmit(e) {
 
 // ── CSV EXPORT ─────────────────────────────────────────────────────────────
 function exportCSV() {
-  const headers = ['Company','Position','Status','Notes','Applied Date','Result','Emails'];
+  const headers = ['Company','Position','Status','Notes','Applied Date','Result','Interview Time','Emails'];
   const rows = applications.map(a => [
     a.company, a.position, a.response || 'Pending', a.notes || '',
-    a.appliedDate || '', a.result || '', (a.emails || '').replace(/\n/g, ' | ')
+    a.appliedDate || '', a.result || '', a.interviewTime || '', (a.emails || '').replace(/\n/g, ' | ')
   ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(','));
 
   const csv = [headers.join(','), ...rows].join('\n');

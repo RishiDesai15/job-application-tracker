@@ -34,6 +34,12 @@ job-tracker/
 
 All data is stored in your browser's `localStorage`. It **never leaves your device** — there's no server, no database, no analytics. To move your data to another browser or device, use the **CSV export** button and re-import manually.
 
+Storage behavior notes:
+- Sample rows are seeded only on first run.
+- If saved data is missing later, the app does not silently reseed over your history.
+- If storage is corrupted or blocked, the app shows an error so you know data could not be loaded/saved.
+- Export CSV periodically as a backup, especially before clearing browser data or switching profiles.
+
 ---
 
 ## 🎨 Status Colors Reference

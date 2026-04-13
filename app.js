@@ -377,24 +377,68 @@ let sortCol       = 'appliedDate';
 let sortDir       = 'desc';
 let pendingDeleteId = null;
 
+const APPS_STORAGE_KEY = 'jobtracker_apps';
+const BOOTSTRAP_STORAGE_KEY = 'jobtracker_bootstrapped_v1';
+
+function isValidApplicationList(value) {
+  if (!Array.isArray(value)) return false;
+  return value.every(item => item && typeof item === 'object' && !Array.isArray(item));
+}
+
 // ── INIT ───────────────────────────────────────────────────────────────────
 function init() {
   initTheme();
-  const stored = localStorage.getItem('jobtracker_apps');
-  if (stored) {
-    try { applications = JSON.parse(stored); }
-    catch { applications = [...SAMPLE_DATA]; save(); }
-  } else {
+  let stored = null;
+  let hasBootstrapped = false;
+
+  try {
+    stored = localStorage.getItem(APPS_STORAGE_KEY);
+    hasBootstrapped = localStorage.getItem(BOOTSTRAP_STORAGE_KEY) === '1';
+  } catch (err) {
+    console.error('Unable to access localStorage on init:', err);
+    applications = [];
+    toast('Storage is blocked. Data cannot be loaded or saved.', 'error');
+    render();
+    bindEvents();
+    return;
+  }
+
+  if (stored && stored.trim()) {
+    try {
+      const parsed = JSON.parse(stored);
+      if (!isValidApplicationList(parsed)) throw new Error('Invalid jobs payload');
+      applications = parsed;
+    } catch (err) {
+      console.error('Corrupted job storage detected:', err);
+      applications = [];
+      toast('Saved jobs are corrupted. Kept empty to avoid overwriting data.', 'error');
+    }
+  } else if (!hasBootstrapped) {
     applications = [...SAMPLE_DATA];
     save();
+  } else {
+    applications = [];
+    toast('No saved jobs found in this browser profile.', 'error');
   }
+
   render();
   bindEvents();
 }
 
 // ── STORAGE ────────────────────────────────────────────────────────────────
 function save() {
-  localStorage.setItem('jobtracker_apps', JSON.stringify(applications));
+  try {
+    localStorage.setItem(APPS_STORAGE_KEY, JSON.stringify(applications));
+    localStorage.setItem(BOOTSTRAP_STORAGE_KEY, '1');
+    return true;
+  } catch (err) {
+    console.error('Failed to persist jobs:', err);
+    const message = err && err.name === 'QuotaExceededError'
+      ? 'Storage full. Export CSV and free browser storage.'
+      : 'Save failed. Changes may not persist after refresh.';
+    toast(message, 'error');
+    return false;
+  }
 }
 
 // ── UID ────────────────────────────────────────────────────────────────────
@@ -710,10 +754,10 @@ function bindEvents() {
   document.getElementById('confirmDelete').addEventListener('click', () => {
     if (pendingDeleteId) {
       applications = applications.filter(a => a.id !== pendingDeleteId);
-      save();
+      const saved = save();
       render();
       closeDeleteModal();
-      toast('Application deleted', 'error');
+      toast(saved ? 'Application deleted' : 'Delete applied locally only', 'error');
     }
   });
   document.getElementById('cancelDelete').addEventListener('click', closeDeleteModal);
@@ -783,13 +827,17 @@ function handleSubmit(e) {
   if (id) {
     const idx = applications.findIndex(a => a.id === id);
     if (idx !== -1) applications[idx] = entry;
-    toast('Application updated ✓', 'success');
   } else {
     applications.unshift(entry);
-    toast('Application added ✓', 'success');
   }
 
-  save();
+  const saved = save();
+  toast(
+    saved
+      ? (id ? 'Application updated ✓' : 'Application added ✓')
+      : (id ? 'Updated locally only; save failed' : 'Added locally only; save failed'),
+    saved ? 'success' : 'error'
+  );
   render();
   closeModal();
 }

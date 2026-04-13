@@ -1,1 +1,8 @@
 .DS_Store
+
+# Private local data/backups (never commit)
+.private/
+
+# Local exports and backup artifacts
+job-applications-*.csv
+*.backup.json

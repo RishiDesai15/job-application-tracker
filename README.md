@@ -42,6 +42,14 @@ Storage behavior notes:
 - A reminder banner appears when CSV backup is overdue (7+ days without export).
 - Export CSV periodically as your portable backup, especially before clearing browser data or switching profiles.
 
+## Privacy-Safe Setup
+
+- Real job data is no longer embedded in `app.js`.
+- Keep private exports in `.private/` (hidden local folder) which is git-ignored.
+- Do not commit CSV/JSON backups to this repository.
+
+Important: if real job data was committed in older commits, remove or rewrite history before sharing the repository publicly.
+
 ---
 
 ## 🎨 Status Colors Reference

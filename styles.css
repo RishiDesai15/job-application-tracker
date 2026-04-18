@@ -248,7 +248,8 @@ header h1 {
   z-index: 9;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: center;
+  gap: 1.5rem;
   padding: 0.875rem 2rem;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -257,9 +258,8 @@ header h1 {
 
 .search-wrap {
   position: relative;
-  flex: 1;
-  min-width: 200px;
-  max-width: 320px;
+  flex: 0 0 auto;
+  width: 280px;
 }
 
 .search-icon {
@@ -296,7 +296,7 @@ header h1 {
   display: flex;
   gap: 0.4rem;
   flex-wrap: wrap;
-  flex: 1;
+  justify-content: center;
 }
 
 .pill {

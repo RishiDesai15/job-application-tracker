@@ -57,6 +57,28 @@ const BACKUP_META_KEY = 'jobtracker_backup_meta_v1';
 const BACKUP_REMINDER_DAYS = 7;
 const BACKUP_REMINDER_SNOOZE_DAYS = 3;
 
+function readCompaniesBackup() {
+  try {
+    const backup = localStorage.getItem(COMPANIES_BACKUP_KEY);
+    if (!backup || !backup.trim()) return [];
+    const parsed = JSON.parse(backup);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    console.warn('Could not read companies backup:', err);
+    return [];
+  }
+}
+
+function writeCompaniesBackup(data) {
+  try {
+    localStorage.setItem(COMPANIES_BACKUP_KEY, JSON.stringify(data));
+    return true;
+  } catch (err) {
+    console.warn('Could not write companies backup:', err);
+    return false;
+  }
+}
+
 function isValidApplicationList(value) {
   if (!Array.isArray(value)) return false;
   return value.every(item => item && typeof item === 'object' && !Array.isArray(item));
@@ -117,16 +139,13 @@ async function loadCompaniesFromFile() {
       if (Array.isArray(data)) {
         companies = data;
         // Keep browser backup in sync with server state for offline refresh fallback.
-        try {
-          localStorage.setItem(COMPANIES_BACKUP_KEY, JSON.stringify(companies));
-        } catch (e) {
-          console.warn('Could not sync companies backup to localStorage:', e);
-        }
+        writeCompaniesBackup(companies);
       } else {
         companies = [];
       }
     } else {
-      companies = [];
+      // API reachable but not healthy: use local backup so refresh keeps data.
+      companies = readCompaniesBackup();
     }
   } catch (err) {
     console.warn('Could not load from server, trying direct file fetch:', err);
@@ -136,27 +155,16 @@ async function loadCompaniesFromFile() {
         const data = await response.json();
         if (Array.isArray(data)) {
           companies = data;
-          try {
-            localStorage.setItem(COMPANIES_BACKUP_KEY, JSON.stringify(companies));
-          } catch (e) {
-            console.warn('Could not sync companies backup to localStorage:', e);
-          }
+          writeCompaniesBackup(companies);
         } else {
           companies = [];
         }
       } else {
-        const backup = localStorage.getItem(COMPANIES_BACKUP_KEY);
-        companies = backup ? JSON.parse(backup) : [];
+        companies = readCompaniesBackup();
       }
     } catch (err2) {
       console.warn('Could not load companies from server/file, trying local backup:', err2);
-      try {
-        const backup = localStorage.getItem(COMPANIES_BACKUP_KEY);
-        companies = backup ? JSON.parse(backup) : [];
-      } catch (backupErr) {
-        console.warn('Could not load companies backup, using empty list:', backupErr);
-        companies = [];
-      }
+      companies = readCompaniesBackup();
     }
   }
 }
@@ -170,27 +178,19 @@ async function saveCompaniesToFile() {
     });
     if (response.ok) {
       console.log('Companies saved to file');
-      try {
-        localStorage.setItem(COMPANIES_BACKUP_KEY, JSON.stringify(companies));
-      } catch (e) {
-        console.warn('Could not update companies backup in localStorage:', e);
-      }
+      writeCompaniesBackup(companies);
       return true;
     } else {
       console.error('Server error:', response.status);
-      return false;
+      // Server responded but rejected save; still keep browser copy persistent.
+      return writeCompaniesBackup(companies);
     }
   } catch (err) {
     console.warn('Could not save to server:', err);
     // Fallback to localStorage
-    try {
-      localStorage.setItem(COMPANIES_BACKUP_KEY, JSON.stringify(companies));
-      console.log('Companies backed up to localStorage');
-      return true;
-    } catch (e) {
-      console.warn('Could not backup to localStorage:', e);
-      return false;
-    }
+    const backedUp = writeCompaniesBackup(companies);
+    if (backedUp) console.log('Companies backed up to localStorage');
+    return backedUp;
   }
 }
 

@@ -630,6 +630,12 @@ function rowStatusClass(status) {
 
 // ── EVENTS ─────────────────────────────────────────────────────────────────
 function bindEvents() {
+  const companyEmailInput = document.getElementById('fCompanyEmail');
+  if (companyEmailInput) {
+    companyEmailInput.required = false;
+    companyEmailInput.removeAttribute('required');
+  }
+
   // Tab switching
   const tabBtns = document.querySelectorAll('.tab-btn');
   tabBtns.forEach(btn => {

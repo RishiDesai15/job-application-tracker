@@ -703,12 +703,6 @@ function bindEvents() {
   if (backupExportBtn) backupExportBtn.addEventListener('click', exportCSV);
   if (backupDismissBtn) backupDismissBtn.addEventListener('click', snoozeBackupReminder);
 
-  // Backup banner for companies
-  const backupExportBtnCompanies = document.getElementById('backupExportNowCompanies');
-  const backupDismissBtnCompanies = document.querySelector('.backup-dismiss-companies');
-  if (backupExportBtnCompanies) backupExportBtnCompanies.addEventListener('click', exportCompaniesCsv);
-  if (backupDismissBtnCompanies) backupDismissBtnCompanies.addEventListener('click', snoozeBackupReminder);
-
   // CSV export for companies
   const exportCompaniesCsvBtn = document.getElementById('exportCompaniesCsv');
   if (exportCompaniesCsvBtn) exportCompaniesCsvBtn.addEventListener('click', exportCompaniesCsv);
@@ -827,8 +821,7 @@ function switchTab(tab) {
   const addCompanyBtn = document.getElementById('openCompanyModal');
   const headerStats = document.getElementById('header-stats');
   const companiesToolbar = document.getElementById('companiesToolbar');
-  const backupBannerApp = document.getElementById('backupBannerApp');
-  const backupBannerCompanies = document.getElementById('backupBannerCompanies');
+  const backupBanner = document.getElementById('backupBanner');
 
   if (tab === 'applications') {
     if (appSection) appSection.style.display = 'block';
@@ -839,8 +832,7 @@ function switchTab(tab) {
     if (addCompanyBtn) addCompanyBtn.style.display = 'none';
     if (headerStats) headerStats.style.display = 'flex';
     if (companiesToolbar) companiesToolbar.style.display = 'none';
-    if (backupBannerApp) backupBannerApp.hidden = false;
-    if (backupBannerCompanies) backupBannerCompanies.hidden = true;
+    if (backupBanner) backupBanner.hidden = false;
   } else if (tab === 'companies') {
     if (appSection) appSection.style.display = 'none';
     if (filtersBar) filtersBar.style.display = 'none';
@@ -850,8 +842,7 @@ function switchTab(tab) {
     if (addCompanyBtn) addCompanyBtn.style.display = 'block';
     if (headerStats) headerStats.style.display = 'none';
     if (companiesToolbar) companiesToolbar.style.display = 'flex';
-    if (backupBannerApp) backupBannerApp.hidden = true;
-    if (backupBannerCompanies) backupBannerCompanies.hidden = false;
+    if (backupBanner) backupBanner.hidden = false;
   }
 }
 

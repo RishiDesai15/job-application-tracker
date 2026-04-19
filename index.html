@@ -47,14 +47,6 @@
     <button class="btn-export" id="exportCSV" title="Export to CSV">↓ CSV</button>
   </div>
 
-  <div class="backup-banner" id="backupBanner" hidden>
-    <p class="backup-banner-text" id="backupBannerText">Backup reminder</p>
-    <div class="backup-banner-actions">
-      <button class="backup-action" id="backupExportNow" type="button">Export CSV now</button>
-      <button class="backup-dismiss" id="backupDismiss" type="button">Dismiss</button>
-    </div>
-  </div>
-
   <!-- TABLE -->
   <main id="applicationsSection">
     <div class="table-wrap">
@@ -95,13 +87,14 @@
     </div>
     <div style="flex: 1;"></div>
   </div>
-  <!-- COMPANIES FILTERS BAR -->
-  <div class="filters-bar" id="companiesFiltersBar" style="display:none">
-    <div class="search-wrap">
-      <span class="search-icon">⌕</span>
-      <input type="text" id="companiesSearchInput" placeholder="Search company, email…" />
+
+  <!-- BACKUP BANNER (shown under companies search) -->
+  <div class="backup-banner" id="backupBanner" hidden>
+    <p class="backup-banner-text" id="backupBannerText">Backup reminder</p>
+    <div class="backup-banner-actions">
+      <button class="backup-action" id="backupExportNow" type="button">Export CSV now</button>
+      <button class="backup-dismiss" id="backupDismiss" type="button">Dismiss</button>
     </div>
-    <div style="flex: 1;"></div>
   </div>
 
   <!-- COMPANIES SECTION -->

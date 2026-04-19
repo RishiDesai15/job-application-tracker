@@ -842,7 +842,7 @@ function switchTab(tab) {
     if (addCompanyBtn) addCompanyBtn.style.display = 'block';
     if (headerStats) headerStats.style.display = 'none';
     if (companiesToolbar) companiesToolbar.style.display = 'flex';
-    if (backupBanner) backupBanner.hidden = true;
+    if (backupBanner) backupBanner.hidden = false;
   }
 }
 

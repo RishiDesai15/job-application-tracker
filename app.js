@@ -388,7 +388,7 @@ function renderCompanies() {
     const q = companiesSearchQuery.toLowerCase();
     data = data.filter(c =>
       c.name.toLowerCase().includes(q) ||
-      c.email.toLowerCase().includes(q) ||
+      (c.email || '').toLowerCase().includes(q) ||
       (c.link || '').toLowerCase().includes(q)
     );
   }
@@ -413,10 +413,11 @@ function renderCompanies() {
 }
 
 function companyRowHTML(company) {
+  const email = (company.email || '').trim();
   return `
     <tr data-id="${company.id}">
       <td class="td-company">${esc(company.name)}</td>
-      <td class="td-email"><a href="mailto:${esc(company.email)}">${esc(company.email)}</a></td>
+      <td class="td-email">${email ? `<a href="mailto:${esc(email)}">${esc(email)}</a>` : '<span style="color: var(--muted);">-</span>'}</td>
       <td class="td-link"><a href="${esc(company.link)}" target="_blank" rel="noopener">Visit Site →</a></td>
       <td onclick="event.stopPropagation()">
         <div class="actions">

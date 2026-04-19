@@ -175,6 +175,12 @@ function updateBackupReminder() {
   const label = document.getElementById('backupBannerText');
   if (!banner || !label) return;
 
+  // Backup reminder is only relevant on the Applications tab.
+  if (currentTab !== 'applications') {
+    banner.hidden = true;
+    return;
+  }
+
   if (!applications.length) {
     banner.hidden = true;
     return;

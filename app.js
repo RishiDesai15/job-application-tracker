@@ -50,6 +50,7 @@ let currentTab = 'applications';
 
 const APPS_STORAGE_KEY = 'jobtracker_apps';
 const COMPANIES_STORAGE_KEY = 'jobtracker_companies';
+const COMPANIES_BACKUP_KEY = 'jobtracker_companies_backup';
 const BOOTSTRAP_STORAGE_KEY = 'jobtracker_bootstrapped_v1';
 const APPS_RECOVERY_BACKUP_KEY = 'jobtracker_apps_backup_v1';
 const BACKUP_META_KEY = 'jobtracker_backup_meta_v1';
@@ -115,6 +116,12 @@ async function loadCompaniesFromFile() {
       const data = await response.json();
       if (Array.isArray(data)) {
         companies = data;
+        // Keep browser backup in sync with server state for offline refresh fallback.
+        try {
+          localStorage.setItem(COMPANIES_BACKUP_KEY, JSON.stringify(companies));
+        } catch (e) {
+          console.warn('Could not sync companies backup to localStorage:', e);
+        }
       } else {
         companies = [];
       }
@@ -129,15 +136,27 @@ async function loadCompaniesFromFile() {
         const data = await response.json();
         if (Array.isArray(data)) {
           companies = data;
+          try {
+            localStorage.setItem(COMPANIES_BACKUP_KEY, JSON.stringify(companies));
+          } catch (e) {
+            console.warn('Could not sync companies backup to localStorage:', e);
+          }
         } else {
           companies = [];
         }
       } else {
-        companies = [];
+        const backup = localStorage.getItem(COMPANIES_BACKUP_KEY);
+        companies = backup ? JSON.parse(backup) : [];
       }
     } catch (err2) {
-      console.warn('Could not load companies, using empty list:', err2);
-      companies = [];
+      console.warn('Could not load companies from server/file, trying local backup:', err2);
+      try {
+        const backup = localStorage.getItem(COMPANIES_BACKUP_KEY);
+        companies = backup ? JSON.parse(backup) : [];
+      } catch (backupErr) {
+        console.warn('Could not load companies backup, using empty list:', backupErr);
+        companies = [];
+      }
     }
   }
 }
@@ -151,6 +170,11 @@ async function saveCompaniesToFile() {
     });
     if (response.ok) {
       console.log('Companies saved to file');
+      try {
+        localStorage.setItem(COMPANIES_BACKUP_KEY, JSON.stringify(companies));
+      } catch (e) {
+        console.warn('Could not update companies backup in localStorage:', e);
+      }
       return true;
     } else {
       console.error('Server error:', response.status);
@@ -160,7 +184,7 @@ async function saveCompaniesToFile() {
     console.warn('Could not save to server:', err);
     // Fallback to localStorage
     try {
-      localStorage.setItem('jobtracker_companies_backup', JSON.stringify(companies));
+      localStorage.setItem(COMPANIES_BACKUP_KEY, JSON.stringify(companies));
       console.log('Companies backed up to localStorage');
       return true;
     } catch (e) {
